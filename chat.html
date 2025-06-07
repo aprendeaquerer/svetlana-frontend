@@ -133,10 +133,10 @@
       if (response.ok) {
         const result = await response.json();
 
-        // Formatear en párrafos si es posible
+        // Formatear inteligentemente en párrafos separados por punto + espacio
         const formatted = result.response
-          .split(/\n{2,}/g) // doble salto de línea como separador de párrafos
-          .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+          .split(/(?<=[.!?])\s+(?=[A-Z¡¿])/g)
+          .map(p => `<p>${p.trim()}</p>`)
           .join('');
 
         chatDiv.innerHTML += `<div class="${personality}"><strong>${personality}:</strong> ${formatted}</div>`;
@@ -151,11 +151,14 @@
     }
   }
 
-  // Saludo automático una vez cargada la página completamente
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      sendMessage("saludo inicial");
-    }, 400); // leve delay para asegurar que el <select> tiene valor
+  // Saludo automático al cargar DOM y tener personalidad lista
+  window.addEventListener("DOMContentLoaded", () => {
+    const personality = document.getElementById("personality").value;
+    if (personality) {
+      setTimeout(() => {
+        sendMessage("saludo inicial");
+      }, 100);
+    }
   });
 </script>
 

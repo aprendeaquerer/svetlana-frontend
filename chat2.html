@@ -94,7 +94,8 @@
             chatDiv.innerHTML += `<p id="loading" class="loading">${personality} is thinking...</p>`;
             chatDiv.scrollTop = chatDiv.scrollHeight;
 
-            const response = await fetch('http://127.0.0.1:8000/chat', {
+            const response = await fetch('https://svetlana-api.onrender.com/') // <-- your real backend API URL
+', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({

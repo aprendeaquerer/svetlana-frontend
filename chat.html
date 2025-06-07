@@ -102,14 +102,17 @@
         }
     });
 
-    async function sendMessage() {
-        const userMessage = userMessageInput.value.trim();
+    async function sendMessage(messageText = null) {
+        const userMessage = messageText || userMessageInput.value.trim();
         const username = sessionStorage.getItem('user_id') || "invitado";
         const personality = document.getElementById('personality').value;
 
         if (userMessage === "") return;
 
-        chatDiv.innerHTML += `<p class="user-msg"><strong>${username}:</strong> ${userMessage}</p>`;
+        if (!messageText) {
+            chatDiv.innerHTML += `<p class="user-msg"><strong>${username}:</strong> ${userMessage}</p>`;
+        }
+
         chatDiv.innerHTML += `<p id="loading" class="loading">${personality} está pensando...</p>`;
         chatDiv.scrollTop = chatDiv.scrollHeight;
 
@@ -140,6 +143,11 @@
             chatDiv.innerHTML += `<p class="loading">Error de red. Intenta de nuevo.</p>`;
         }
     }
+
+    // Saludo automático al cargar la página
+    window.addEventListener("load", () => {
+        sendMessage("saludo inicial");
+    });
 </script>
 
 </body>

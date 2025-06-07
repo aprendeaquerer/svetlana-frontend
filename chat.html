@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -112,7 +112,7 @@
 
         if (!username) {
             alert("Session expired or not logged in.");
-            window.location.href = 'main.html';
+            window.location.href = 'index.html';
             return;
         }
 
@@ -123,8 +123,7 @@
         chatDiv.scrollTop = chatDiv.scrollHeight;
 
         try {
-            const response = await fetch('https://svetlana-api.onrender.com/') // <-- your real backend API URL
-, {
+            const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({

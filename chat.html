@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -28,7 +29,7 @@
       flex-direction: column;
       width: 90%;
       max-width: 800px;
-      height: 90vh;
+      height: 95vh;
       background: #fff;
       padding: 1.5rem;
       border-radius: 12px;
@@ -67,18 +68,16 @@
     .loading { color: #aaa; font-style: italic; }
 
     @media (max-width: 768px) {
-      .container {
-        width: 100%;
-        height: 95vh;
-        padding: 1rem;
-      }
+      .container { width: 100%; height: 95vh; padding: 1rem; }
     }
   </style>
 </head>
 <body>
-
 <div class="container">
   <h2>Aprende a querer</h2>
+
+  <label for="user_id">Tu nombre o apodo:</label>
+  <input type="text" id="user_id" placeholder="invitado">
 
   <label for="personality">Elige una personalidad:</label>
   <select id="personality">
@@ -88,7 +87,6 @@
   </select>
 
   <div id="chat"></div>
-
   <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
 </div>
 
@@ -96,6 +94,7 @@
   const chatDiv = document.getElementById('chat');
   const userMessageInput = document.getElementById('user_message');
   const personalitySelect = document.getElementById('personality');
+  const userIdInput = document.getElementById('user_id');
 
   userMessageInput.addEventListener("keyup", function (event) {
     if (event.key === "Enter") {
@@ -105,7 +104,7 @@
 
   async function sendMessage(messageText = null) {
     const userMessage = messageText || userMessageInput.value.trim();
-    const username = sessionStorage.getItem('user_id') || "invitado";
+    const username = userIdInput.value.trim() || "invitado";
     const personality = personalitySelect.value;
 
     if (userMessage === "") return;
@@ -132,8 +131,6 @@
 
       if (response.ok) {
         const result = await response.json();
-
-        // Formatear inteligentemente en párrafos separados por punto + espacio
         const formatted = result.response
           .split(/(?<=[.!?])\s+(?=[A-Z¡¿])/g)
           .map(p => `<p>${p.trim()}</p>`)
@@ -151,16 +148,11 @@
     }
   }
 
-  // Saludo automático al cargar DOM y tener personalidad lista
   window.addEventListener("DOMContentLoaded", () => {
-    const personality = document.getElementById("personality").value;
-    if (personality) {
-      setTimeout(() => {
-        sendMessage("saludo inicial");
-      }, 100);
-    }
+    setTimeout(() => {
+      sendMessage("saludo inicial");
+    }, 200);
   });
 </script>
-
 </body>
 </html>

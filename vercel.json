@@ -1,9 +1,3 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/chat.html",
-      "permanent": true
-    }
-  ]
+  "redirects": []
 }

@@ -130,7 +130,7 @@
 
       if (response.ok) {
         const result = await response.json();
-        chatDiv.innerHTML += `<div class="${personality}"><strong>${personality}:</strong> ${result.response}</div>`;
+        chatDiv.innerHTML += `<div class="${personality}">${result.response}</div>`;
         userMessageInput.value = '';
         chatDiv.scrollTop = chatDiv.scrollHeight;
       } else {

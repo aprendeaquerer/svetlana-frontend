@@ -6,12 +6,13 @@
   <title>Aprende a querer</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter&family=Montserrat:wght@700&display=swap" rel="stylesheet">
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 1rem;
       font-family: 'Inter', sans-serif;
       background-color: transparent;
       color: #2C2C2C;
-      margin: 0;
-      padding: 1rem;
+      overflow-x: hidden;
     }
 
     label {
@@ -31,8 +32,6 @@
     }
 
     #chat {
-      max-height: 70vh;
-      overflow-y: auto;
       padding-bottom: 1rem;
     }
 
@@ -48,7 +47,6 @@
 
     .user-msg {
       background-color: #f1f1f1;
-      align-self: flex-end;
     }
 
     .Eldric {
@@ -93,6 +91,11 @@
     const personalitySelect = document.getElementById('personality');
     const userIdInput = document.getElementById('user_id');
 
+    function resizeIframe() {
+      const height = document.body.scrollHeight;
+      parent.postMessage({ type: "resize", height }, "*");
+    }
+
     userMessageInput.addEventListener("keyup", function (event) {
       if (event.key === "Enter") {
         sendMessage();
@@ -111,17 +114,13 @@
       }
 
       chatDiv.innerHTML += `<div id="loading" class="loading">${personality} está pensando...</div>`;
-      chatDiv.scrollTop = chatDiv.scrollHeight;
+      resizeIframe();
 
       try {
         const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: username,
-            message: userMessage,
-            personality
-          })
+          body: JSON.stringify({ user_id: username, message: userMessage, personality })
         });
 
         document.getElementById('loading').remove();
@@ -130,7 +129,6 @@
           const result = await response.json();
           chatDiv.innerHTML += `<div class="message ${personality}">${result.response}</div>`;
           userMessageInput.value = '';
-          chatDiv.scrollTop = chatDiv.scrollHeight;
         } else {
           chatDiv.innerHTML += `<div class="loading">Hubo un error al enviar el mensaje.</div>`;
         }
@@ -138,12 +136,13 @@
         document.getElementById('loading')?.remove();
         chatDiv.innerHTML += `<div class="loading">Error de red. Intenta de nuevo.</div>`;
       }
+
+      resizeIframe();
+      chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        sendMessage("saludo inicial");
-      }, 200);
+      sendMessage("saludo inicial");
     });
   </script>
 </body>

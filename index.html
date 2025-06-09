@@ -78,22 +78,14 @@
 
     .chat-container iframe {
       width: 100%;
-      height: 600px;
       border: none;
-      border-radius: 16px;
+      overflow: hidden;
     }
 
     @media (max-width: 768px) {
       body, html {
         margin: 0;
         padding: 0;
-        height: 100%;
-        overflow: hidden;
-      }
-
-      #home {
-        padding: 0;
-        margin: 0;
       }
 
       .navbar, .home-sec, .footer-content {
@@ -102,15 +94,11 @@
 
       .chat-container {
         width: 100vw;
-        height: 100vh;
         padding: 0;
-        margin: 0;
       }
 
       .chat-container iframe {
         width: 100%;
-        height: 100%;
-        border-radius: 0;
       }
     }
   </style>
@@ -137,7 +125,7 @@
 
     <div id="chatbot" class="mt-5">
       <div class="chat-container">
-        <iframe src="/chat.html"></iframe>
+        <iframe src="/chat.html" scrolling="no" id="chatframe"></iframe>
       </div>
     </div>
 
@@ -149,6 +137,16 @@
     <p>© 2024 Aprende a querer. Todos los derechos reservados.</p>
   </div>
 </footer>
+
+<script>
+  // Ajuste dinámico de altura del iframe
+  window.addEventListener("message", (event) => {
+    const iframe = document.getElementById("chatframe");
+    if (event.data?.type === "resize" && event.data?.height) {
+      iframe.style.height = event.data.height + "px";
+    }
+  });
+</script>
 
 <script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="assets/js/landing.js"></script>

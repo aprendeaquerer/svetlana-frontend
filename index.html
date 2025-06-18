@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Aprende a querer</title>
+  <link rel="stylesheet" href="assets/css/vendors/bootstrap.css">
+  <link rel="stylesheet" href="assets/css/landing.css">
+  <style>
+    :root {
+      --color-primary: #BFA2DB;
+      --color-secondary: #EBD8C3;
+      --color-accent: #F6B2A5;
+      --color-bg: #F9F9F9;
+      --color-text: #2C2C2C;
+      --color-border: #E0E0E0;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'Outfit', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2 {
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .btn-solid {
+      background-color: var(--color-accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.25rem;
+      text-decoration: none;
+    }
+
+    .btn-solid:hover {
+      background-color: #e6958c;
+    }
+
+    .navbar {
+      background-color: white;
+      border-bottom: 1px solid var(--color-border);
+      padding: 0.5rem 1rem;
+    }
+
+    .navbar-title {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: var(--color-primary);
+    }
+
+    .navbar-buttons {
+      margin-left: auto;
+    }
+
+    .navbar-buttons a {
+      margin-left: 1rem;
+    }
+
+    .footer-content {
+      background-color: var(--color-secondary);
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--color-text);
+    }
+
+    .chat-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    .chat-container iframe {
+      width: 100%;
+      border: none;
+      overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+      body, html {
+        margin: 0;
+        padding: 0;
+      }
+
+      .navbar, .home-sec, .footer-content {
+        display: none;
+      }
+
+      .chat-container {
+        width: 100vw;
+        padding: 0;
+      }
+
+      .chat-container iframe {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg d-flex align-items-center">
+  <div class="navbar-title">Aprende a querer</div>
+  <div class="navbar-buttons d-flex align-items-center">
+    <a href="/login.html" class="btn-solid">Iniciar sesión</a>
+    <a href="/register.html" class="btn-solid">Registrarse</a>
+  </div>
+</nav>
+
+<section id="home" class="section-b-space home-section">
+  <div class="container-fluid">
+    <div class="home-sec">
+      <div class="home-content">
+        <div>
+          <h2>Descubre tu estilo de apego con Eldric el coach</h2>
+        </div>
+      </div>
+    </div>
+
+    <div id="chatbot" class="mt-5">
+      <div class="chat-container">
+        <iframe src="/chat.html" scrolling="no" id="chatframe"></iframe>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-content">
+    <p>© 2024 Aprende a querer. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<script>
+  // Ajuste dinámico de altura del iframe
+  window.addEventListener("message", (event) => {
+    const iframe = document.getElementById("chatframe");
+    if (event.data?.type === "resize" && event.data?.height) {
+      iframe.style.height = event.data.height + "px";
+    }
+  });
+</script>
+
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/landing.js"></script>
+</body>
+</html>

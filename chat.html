@@ -129,15 +129,14 @@
       resizeIframe();
 
       try {
-        console.log('Sending message:', { user_id: username, message: processedMessage, personality: "Eldric" });
+        console.log('Sending message:', { user_id: username, message: processedMessage });
         
         const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             user_id: username, 
-            message: processedMessage,
-            personality: "Eldric"
+            message: processedMessage
           })
         });
 
@@ -176,8 +175,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             user_id: "test", 
-            message: "test",
-            personality: "Eldric"
+            message: "test"
           })
         });
         console.log('API Test Response Status:', testResponse.status);

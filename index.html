@@ -89,7 +89,7 @@
     .chat-container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 1rem;
+      padding: 0.5rem;
     }
 
     .chat-container iframe {
@@ -98,13 +98,36 @@
       overflow: hidden;
     }
 
+    .home-section {
+      margin-top: -1rem;
+    }
+
     @media (max-width: 768px) {
       body, html {
         margin: 0;
         padding: 0;
       }
 
-      .navbar, .home-sec, .footer-content {
+      .navbar {
+        padding: 0.25rem 0.5rem;
+      }
+
+      .navbar-title {
+        font-size: 1rem;
+      }
+
+      .btn-solid {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+      }
+
+      .name-input {
+        width: 80px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      .home-sec, .footer-content {
         display: none;
       }
 
@@ -132,20 +155,11 @@
 
 <section id="home" class="section-b-space home-section">
   <div class="container-fluid">
-    <div class="home-sec">
-      <div class="home-content">
-        <div>
-          <h2>Descubre tu estilo de apego con Eldric el coach</h2>
-        </div>
-      </div>
-    </div>
-
-    <div id="chatbot" class="mt-5">
+    <div id="chatbot">
       <div class="chat-container">
         <iframe src="/chat.html" scrolling="no" id="chatframe"></iframe>
       </div>
     </div>
-
   </div>
 </section>
 

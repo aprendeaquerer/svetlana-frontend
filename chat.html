@@ -100,6 +100,8 @@
     function resizeIframe() {
       const height = document.body.scrollHeight;
       parent.postMessage({ type: "resize", height }, "*");
+      // Auto-scroll to bottom
+      chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 
     userMessageInput.addEventListener("keyup", function (event) {
@@ -115,6 +117,7 @@
 
       if (!messageText) {
         chatDiv.innerHTML += `<div class="message user-msg"><strong>${username}:</strong> ${userMessage}</div>`;
+        chatDiv.scrollTop = chatDiv.scrollHeight;
       }
 
       chatDiv.innerHTML += `<div id="loading" class="loading">Eldric está pensando...</div>`;
@@ -124,7 +127,11 @@
         const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: username, message: userMessage })
+          body: JSON.stringify({ 
+            user_id: username, 
+            message: userMessage,
+            personality: "Eldric"
+          })
         });
 
         document.getElementById('loading').remove();
@@ -133,6 +140,7 @@
           const result = await response.json();
           chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
           userMessageInput.value = '';
+          chatDiv.scrollTop = chatDiv.scrollHeight;
         } else {
           chatDiv.innerHTML += `<div class="loading">Hubo un error al enviar el mensaje.</div>`;
         }

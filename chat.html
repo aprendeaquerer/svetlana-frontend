@@ -140,6 +140,9 @@
           })
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
         document.getElementById('loading').remove();
 
         if (response.ok) {
@@ -149,13 +152,14 @@
           userMessageInput.value = '';
           chatDiv.scrollTop = chatDiv.scrollHeight;
         } else {
-          console.error('API Error:', response.status, response.statusText);
-          chatDiv.innerHTML += `<div class="loading">Hubo un error al enviar el mensaje.</div>`;
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
+          chatDiv.innerHTML += `<div class="loading">Hubo un error al enviar el mensaje. Status: ${response.status}</div>`;
         }
       } catch (error) {
         console.error('Network Error:', error);
         document.getElementById('loading')?.remove();
-        chatDiv.innerHTML += `<div class="loading">Error de red. Intenta de nuevo.</div>`;
+        chatDiv.innerHTML += `<div class="loading">Error de red. Intenta de nuevo. ${error.message}</div>`;
       }
 
       resizeIframe();
@@ -170,6 +174,14 @@
 
     async function testAPI() {
       try {
+        // First test if the backend is up
+        const healthCheck = await fetch('https://svetlana-api-ak3a.onrender.com/');
+        console.log('Backend health check status:', healthCheck.status);
+        if (healthCheck.ok) {
+          const healthResult = await healthCheck.json();
+          console.log('Backend health check result:', healthResult);
+        }
+
         const testResponse = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -182,6 +194,9 @@
         if (testResponse.ok) {
           const testResult = await testResponse.json();
           console.log('API Test Result:', testResult);
+        } else {
+          const errorText = await testResponse.text();
+          console.error('API Test Error:', errorText);
         }
       } catch (error) {
         console.error('API Test Failed:', error);

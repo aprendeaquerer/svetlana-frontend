@@ -62,16 +62,20 @@
   </style>
 </head>
 <body>
-  <label for="user_id">Tu nombre o apodo:</label>
-  <input type="text" id="user_id" placeholder="invitado" />
-
   <div id="chat"></div>
   <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
 
   <script>
     const chatDiv = document.getElementById('chat');
     const userMessageInput = document.getElementById('user_message');
-    const userIdInput = document.getElementById('user_id');
+    let username = "invitado"; // Default username
+
+    // Listen for name updates from parent window
+    window.addEventListener("message", (event) => {
+      if (event.data?.type === "updateName") {
+        username = event.data.name;
+      }
+    });
 
     function resizeIframe() {
       const height = document.body.scrollHeight;
@@ -86,8 +90,6 @@
 
     async function sendMessage(messageText = null) {
       const userMessage = messageText || userMessageInput.value.trim();
-      const username = userIdInput?.value.trim() || "invitado";
-      const personality = "Eldric"; // Always use Eldric
 
       if (userMessage === "") return;
 

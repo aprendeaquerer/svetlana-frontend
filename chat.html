@@ -116,9 +116,10 @@
       }
       
       #chat {
-        max-height: 60vh;
+        max-height: calc(100vh - 120px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        padding-bottom: 80px;
       }
       
       .message {
@@ -138,6 +139,7 @@
         border-top: 1px solid #e0e0e0;
         margin-bottom: 0;
         z-index: 1000;
+        height: 70px;
       }
       
       input[type="text"] {

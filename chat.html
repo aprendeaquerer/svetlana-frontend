@@ -120,6 +120,27 @@
       }
     });
 
+    // Helper to generate UUID
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function getUserId() {
+      // If the username is 'invitado', use a persistent session id
+      if (username === 'invitado') {
+        let sessionId = localStorage.getItem('invitado_session_id');
+        if (!sessionId) {
+          sessionId = generateUUID();
+          localStorage.setItem('invitado_session_id', sessionId);
+        }
+        return sessionId;
+      }
+      return username;
+    }
+
     async function sendMessage(messageText = null) {
       const userMessage = messageText || userMessageInput.value.trim();
 
@@ -130,6 +151,8 @@
         ? userMessage.toUpperCase() 
         : userMessage;
 
+      const user_id = getUserId();
+
       if (!messageText) {
         chatDiv.innerHTML += `<div class="message user-msg"><strong>${username}:</strong> ${userMessage}</div>`;
         scrollToBottom();
@@ -139,13 +162,13 @@
       resizeIframe();
 
       try {
-        console.log('Sending message:', { user_id: username, message: processedMessage });
+        console.log('Sending message:', { user_id, message: processedMessage });
         
         const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            user_id: username, 
+            user_id, 
             message: processedMessage
           })
         });

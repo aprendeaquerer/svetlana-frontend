@@ -102,11 +102,16 @@
       }
     });
 
+    function scrollToBottom() {
+      setTimeout(() => {
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }, 50);
+    }
+
     function resizeIframe() {
       const height = document.body.scrollHeight;
       parent.postMessage({ type: "resize", height }, "*");
-      // Auto-scroll to bottom
-      chatDiv.scrollTop = chatDiv.scrollHeight;
+      scrollToBottom();
     }
 
     userMessageInput.addEventListener("keyup", function (event) {
@@ -127,7 +132,7 @@
 
       if (!messageText) {
         chatDiv.innerHTML += `<div class="message user-msg"><strong>${username}:</strong> ${userMessage}</div>`;
-        chatDiv.scrollTop = chatDiv.scrollHeight;
+        scrollToBottom();
       }
 
       chatDiv.innerHTML += `<div id="loading" class="loading">Eldric está pensando...</div>`;
@@ -152,19 +157,21 @@
 
         if (response.ok) {
           const result = await response.json();
-          console.log('API Response:', result);
+          console.log('API Response (full):', result);
           chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
           userMessageInput.value = '';
-          chatDiv.scrollTop = chatDiv.scrollHeight;
+          scrollToBottom();
         } else {
           const errorText = await response.text();
           console.error('API Error Response:', errorText);
           chatDiv.innerHTML += `<div class="loading">Hubo un error al enviar el mensaje. Status: ${response.status}</div>`;
+          scrollToBottom();
         }
       } catch (error) {
         console.error('Network Error:', error);
         document.getElementById('loading')?.remove();
         chatDiv.innerHTML += `<div class="loading">Error de red. Intenta de nuevo. ${error.message}</div>`;
+        scrollToBottom();
       }
 
       resizeIframe();

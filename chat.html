@@ -387,7 +387,6 @@
       // Set loading state
       setLoadingState(true);
       chatDiv.innerHTML += `<div id="loading" class="loading">Eldric está pensando...</div>`;
-      resizeIframe();
 
       try {
         console.log('Sending message:', { user_id, message: processedMessage });
@@ -397,6 +396,7 @@
           message: processedMessage
         });
 
+        document.getElementById('loading')?.remove();
         console.log('API Response (full):', result);
         chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
         userMessageInput.value = '';

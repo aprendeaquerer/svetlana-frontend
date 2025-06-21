@@ -31,6 +31,33 @@
       font-size: 1rem;
     }
 
+    .input-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .send-button {
+      background-color: #bfa2db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.2s;
+    }
+
+    .send-button:hover {
+      background-color: #a88bc7;
+    }
+
+    .send-button:active {
+      background-color: #8f6bb3;
+    }
+
     #chat {
       padding-bottom: 1rem;
       max-height: 70vh;
@@ -103,15 +130,39 @@
         border-radius: 10px;
       }
       
+      .input-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 0.5rem;
+        border-top: 1px solid #e0e0e0;
+        margin-bottom: 0;
+        z-index: 1000;
+      }
+      
       input[type="text"] {
-        margin-bottom: 0.5rem;
+        flex: 1;
+        margin-bottom: 0;
+        border-radius: 20px;
+        padding: 0.75rem 1rem;
+      }
+      
+      .send-button {
+        padding: 0.75rem 1.25rem;
+        border-radius: 20px;
+        font-weight: 500;
       }
     }
   </style>
 </head>
 <body>
   <div id="chat"></div>
-  <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
+  <div class="input-container">
+    <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
+    <button id="send_button" class="send-button">Enviar</button>
+  </div>
 
   <script>
     const chatDiv = document.getElementById('chat');
@@ -157,6 +208,12 @@
       if (event.key === "Enter") {
         sendMessage();
       }
+    });
+
+    // Add send button functionality
+    const sendButton = document.getElementById('send_button');
+    sendButton.addEventListener("click", function() {
+      sendMessage();
     });
 
     // Helper to generate UUID

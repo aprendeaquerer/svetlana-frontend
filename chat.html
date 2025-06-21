@@ -38,6 +38,31 @@
       margin-bottom: 0.75rem;
     }
 
+    .input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .char-counter {
+      position: absolute;
+      bottom: -20px;
+      right: 0;
+      font-size: 0.75rem;
+      color: #666;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .char-counter.warning {
+      color: #ffc107;
+    }
+
+    .char-counter.danger {
+      color: #dc3545;
+    }
+
     .send-button {
       background-color: #bfa2db;
       color: white;
@@ -109,6 +134,40 @@
       color: #aaa;
       font-style: italic;
       margin-bottom: 1rem;
+      padding: 0.5rem;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      border-left: 3px solid #bfa2db;
+    }
+
+    .error-msg {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(220, 53, 69, 0.1);
+    }
+
+    .success-msg {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(40, 167, 69, 0.1);
+    }
+
+    .send-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .send-button:disabled:hover {
+      background-color: #ccc;
     }
 
     @media (max-width: 768px) {
@@ -149,6 +208,16 @@
         padding: 0.75rem 1rem;
       }
       
+      .input-wrapper {
+        flex: 1;
+      }
+      
+      .char-counter {
+        bottom: -25px;
+        font-size: 0.7rem;
+        background-color: rgba(255, 255, 255, 0.95);
+      }
+      
       .send-button {
         padding: 0.75rem 1.25rem;
         border-radius: 20px;
@@ -160,7 +229,10 @@
 <body>
   <div id="chat"></div>
   <div class="input-container">
-    <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
+    <div class="input-wrapper">
+      <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
+      <div class="char-counter" id="charCounter">0/1000</div>
+    </div>
     <button id="send_button" class="send-button">Enviar</button>
   </div>
 
@@ -216,6 +288,24 @@
       sendMessage();
     });
 
+    // Character counter functionality
+    const charCounter = document.getElementById('charCounter');
+    userMessageInput.addEventListener("input", function() {
+      const length = this.value.length;
+      const maxLength = 1000;
+      
+      charCounter.textContent = `${length}/${maxLength}`;
+      charCounter.className = 'char-counter';
+      
+      if (length > maxLength * 0.9) {
+        charCounter.classList.add('warning');
+      }
+      if (length > maxLength * 0.95) {
+        charCounter.classList.remove('warning');
+        charCounter.classList.add('danger');
+      }
+    });
+
     // Helper to generate UUID
     function generateUUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -237,10 +327,50 @@
       return username;
     }
 
+    // Send message with retry logic
+    async function sendMessageWithRetry(data, maxRetries = 2) {
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          if (response.ok) {
+            return await response.json();
+          }
+          
+          // If rate limited, wait before retry
+          if (response.status === 429) {
+            const waitTime = 1000 * (i + 1);
+            showError(`Demasiadas peticiones. Reintentando en ${waitTime/1000} segundos...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            continue;
+          }
+          
+          // For other errors, throw immediately
+          throw new Error(`HTTP ${response.status}`);
+        } catch (error) {
+          if (i === maxRetries - 1) throw error;
+          
+          // Wait before retry with exponential backoff
+          const waitTime = 1000 * Math.pow(2, i);
+          showError(`Error de conexión. Reintentando en ${waitTime/1000} segundos...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+
     async function sendMessage(messageText = null) {
       const userMessage = messageText || userMessageInput.value.trim();
 
-      if (userMessage === "") return;
+      // Input validation
+      const validation = validateMessage(userMessage);
+      if (!validation.valid) {
+        showError(validation.error);
+        return;
+      }
 
       // Convert single letter choices to uppercase for better recognition
       const processedMessage = userMessage.length === 1 && /[abc]/i.test(userMessage) 
@@ -250,51 +380,87 @@
       const user_id = getUserId();
 
       if (!messageText) {
-        chatDiv.innerHTML += `<div class="message user-msg"><strong>${username}:</strong> ${userMessage}</div>`;
+        chatDiv.innerHTML += `<div class="message user-msg"><strong>${sanitizeHTML(username)}:</strong> ${sanitizeHTML(userMessage)}</div>`;
         scrollToBottom();
       }
 
+      // Set loading state
+      setLoadingState(true);
       chatDiv.innerHTML += `<div id="loading" class="loading">Eldric está pensando...</div>`;
       resizeIframe();
 
       try {
         console.log('Sending message:', { user_id, message: processedMessage });
         
-        const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            user_id, 
-            message: processedMessage
-          })
+        const result = await sendMessageWithRetry({ 
+          user_id, 
+          message: processedMessage
         });
 
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-
-        document.getElementById('loading').remove();
-
-        if (response.ok) {
-          const result = await response.json();
-          console.log('API Response (full):', result);
-          chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
-          userMessageInput.value = '';
-          scrollToBottom();
-        } else {
-          const errorText = await response.text();
-          console.error('API Error Response:', errorText);
-          chatDiv.innerHTML += `<div class="loading">Hubo un error al enviar el mensaje. Status: ${response.status}</div>`;
-          scrollToBottom();
-        }
+        console.log('API Response (full):', result);
+        chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
+        userMessageInput.value = '';
+        scrollToBottom();
       } catch (error) {
         console.error('Network Error:', error);
         document.getElementById('loading')?.remove();
-        chatDiv.innerHTML += `<div class="loading">Error de red. Intenta de nuevo. ${error.message}</div>`;
-        scrollToBottom();
+        showError(`Error de conexión: ${error.message}. Verifica tu conexión a internet.`);
+      } finally {
+        setLoadingState(false);
+        resizeIframe();
+        chatDiv.scrollTop = chatDiv.scrollHeight;
       }
+    }
 
-      resizeIframe();
-      chatDiv.scrollTop = chatDiv.scrollHeight;
+    // Input validation function
+    function validateMessage(message) {
+      if (!message || message.trim().length === 0) {
+        return { valid: false, error: 'El mensaje no puede estar vacío' };
+      }
+      if (message.length > 1000) {
+        return { valid: false, error: 'El mensaje es demasiado largo (máximo 1000 caracteres)' };
+      }
+      // Check for potentially harmful content
+      if (/<script|javascript:|on\w+\s*=|data:text\/html/i.test(message)) {
+        return { valid: false, error: 'El mensaje contiene contenido no permitido' };
+      }
+      return { valid: true };
+    }
+
+    // Sanitize HTML to prevent XSS attacks
+    function sanitizeHTML(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Set loading state for better UX
+    function setLoadingState(isLoading) {
+      const sendButton = document.getElementById('send_button');
+      const input = document.getElementById('user_message');
+      
+      if (isLoading) {
+        sendButton.disabled = true;
+        sendButton.textContent = 'Enviando...';
+        input.disabled = true;
+      } else {
+        sendButton.disabled = false;
+        sendButton.textContent = 'Enviar';
+        input.disabled = false;
+      }
+    }
+
+    // Show error messages
+    function showError(message) {
+      chatDiv.innerHTML += `<div class="message error-msg">❌ ${sanitizeHTML(message)}</div>`;
+      scrollToBottom();
+    }
+
+    // Show success messages
+    function showSuccess(message) {
+      chatDiv.innerHTML += `<div class="message success-msg">✅ ${sanitizeHTML(message)}</div>`;
+      scrollToBottom();
     }
 
     window.addEventListener("DOMContentLoaded", () => {

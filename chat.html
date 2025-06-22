@@ -244,7 +244,7 @@
   <div class="input-container">
     <div class="input-wrapper">
       <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
-      
+      <div class="char-counter" id="charCounter">0/1000</div>
     </div>
     <button id="send_button" class="send-button">Enviar</button>
   </div>
@@ -482,14 +482,14 @@
     window.addEventListener("DOMContentLoaded", () => {
       // Test API connection first
       testAPI();
-      // Send language-specific initial greeting\n        const greetingPhrases = {\n            "es": "saludo inicial",\n            "en": "initial greeting",\n            "ru": "????????? ???????????"\n        };\n        const greetingPhrase = greetingPhrases[language] || "saludo inicial";\n        sendMessage(greetingPhrase);
-      
-      // Ensure scroll works on page load
-      setTimeout(() => {
-        scrollToBottom();
-      }, 500);
-    });
-
+        // Send language-specific initial greeting
+        const greetingPhrases = {
+            "es": "saludo inicial",
+            "en": "initial greeting",
+            "ru": "????????? ???????????"
+        };
+        const greetingPhrase = greetingPhrases[language] || "saludo inicial";
+        sendMessage(greetingPhrase);
     async function testAPI() {
       try {
         // First test if the backend is up

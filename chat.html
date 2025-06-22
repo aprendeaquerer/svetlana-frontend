@@ -84,17 +84,18 @@
     }
 
     #chat {
-      padding-bottom: 1rem;
+      padding-bottom: 0.5rem;
       max-height: 70vh;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      margin-bottom: 0.5rem;
     }
 
     .message {
       background-color: #e6e6e6;
       padding: 1rem;
       border-radius: 12px;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       white-space: pre-wrap;
       line-height: 1.5;
@@ -131,13 +132,15 @@
     }
 
     .loading {
-      color: #aaa;
+      color: #666;
       font-style: italic;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding: 0.75rem;
       background-color: #f8f9fa;
-      border-radius: 8px;
+      border-radius: 12px;
       border-left: 3px solid #bfa2db;
+      border: 1px solid #e0e0e0;
+      font-size: 0.9rem;
     }
 
     .error-msg {
@@ -172,14 +175,16 @@
 
     @media (max-width: 768px) {
       html, body {
-        padding: 0.5rem;
+        padding: 0.25rem;
         margin: 0;
       }
       
       #chat {
-        max-height: 60vh;
+        max-height: calc(100vh - 120px);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.25rem;
+        margin-bottom: 0.25rem;
       }
       
       .message {
@@ -187,6 +192,7 @@
         font-size: 1.05rem;
         line-height: 1.7;
         border-radius: 10px;
+        margin-bottom: 0.5rem;
       }
       
       .input-container {
@@ -199,6 +205,7 @@
         border-top: 1px solid #e0e0e0;
         margin-bottom: 0;
         z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
       }
       
       input[type="text"] {
@@ -222,6 +229,12 @@
         padding: 0.75rem 1.25rem;
         border-radius: 20px;
         font-weight: 500;
+      }
+      
+      .loading {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
       }
     }
   </style>

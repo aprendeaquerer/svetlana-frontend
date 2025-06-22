@@ -63,6 +63,16 @@
       background-color: #8f6bb3;
     }
 
+    .send-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .send-button:disabled:hover {
+      background-color: #ccc;
+    }
+
     #chat {
       padding-bottom: 0.5rem;
       max-height: 70vh;
@@ -141,16 +151,6 @@
       padding: 1rem;
       margin-bottom: 1rem;
       box-shadow: 0 2px 6px rgba(40, 167, 69, 0.1);
-    }
-
-    .send-button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    .send-button:disabled:hover {
-      background-color: #ccc;
     }
 
     @media (max-width: 768px) {

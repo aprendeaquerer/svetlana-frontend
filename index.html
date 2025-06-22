@@ -246,7 +246,19 @@
   languageSelector.addEventListener("change", updateIframeData);
 
   // Set initial data when iframe loads
-  chatFrame.addEventListener("load", updateIframeData);
+  chatFrame.addEventListener("load", function() {
+    // Wait a bit for the iframe to be fully ready
+    setTimeout(() => {
+      updateIframeData();
+      
+      // Send initial greeting after iframe is loaded
+      setTimeout(() => {
+        chatFrame.contentWindow.postMessage({ 
+          type: "sendInitialGreeting"
+        }, "*");
+      }, 500);
+    }, 100);
+  });
 </script>
 
 <script src="assets/js/bootstrap.bundle.min.js"></script>

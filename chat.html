@@ -234,7 +234,23 @@
         username = event.data.name;
         language = event.data.language;
       }
+      
+      // Handle initial greeting trigger from parent
+      if (event.data?.type === "sendInitialGreeting") {
+        sendInitialGreeting();
+      }
     });
+
+    function sendInitialGreeting() {
+      // Send language-specific initial greeting
+      const greetingPhrases = {
+        "es": "saludo inicial",
+        "en": "initial greeting",
+        "ru": "начальное приветствие"
+      };
+      const greetingPhrase = greetingPhrases[language] || "saludo inicial";
+      sendMessage(greetingPhrase);
+    }
 
     function scrollToBottom() {
       setTimeout(() => {
@@ -434,15 +450,6 @@
     window.addEventListener("DOMContentLoaded", () => {
       // Test API connection first
       testAPI();
-      
-      // Send language-specific initial greeting
-      const greetingPhrases = {
-        "es": "saludo inicial",
-        "en": "initial greeting",
-        "ru": "начальное приветствие"
-      };
-      const greetingPhrase = greetingPhrases[language] || "saludo inicial";
-      sendMessage(greetingPhrase);
     });
 
     async function testAPI() {

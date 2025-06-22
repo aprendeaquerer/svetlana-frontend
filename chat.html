@@ -566,6 +566,21 @@
     }
 
     function sendInitialGreeting() {
+      // Remove previous greeting messages (only greeting messages, not user messages)
+      const messages = chatDiv.querySelectorAll('.message');
+      messages.forEach(message => {
+        // Check if this is a greeting message (contains greeting phrases)
+        const text = message.textContent.toLowerCase();
+        if (text.includes('saludo inicial') || 
+            text.includes('initial greeting') || 
+            text.includes('начальное приветствие') ||
+            text.includes('hola') ||
+            text.includes('hello') ||
+            text.includes('привет')) {
+          message.remove();
+        }
+      });
+      
       // Send language-specific initial greeting
       const greetingPhrases = {
         "es": "saludo inicial",

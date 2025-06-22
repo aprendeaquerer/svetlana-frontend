@@ -78,6 +78,10 @@
       color: #999;
     }
 
+    #languageSelector {
+      min-width: 80px;
+    }
+
     .footer-content {
       background-color: var(--color-secondary);
       padding: 1rem;
@@ -141,6 +145,12 @@
         border-radius: 4px;
       }
 
+      #languageSelector {
+        min-width: 60px;
+        font-size: 0.7rem;
+        padding: 0.25rem 0.3rem;
+      }
+
       .navbar-buttons {
         gap: 0.25rem;
       }
@@ -180,6 +190,11 @@
 <nav class="navbar navbar-expand-lg d-flex align-items-center">
   <div class="navbar-title">Aprende a querer</div>
   <div class="navbar-buttons d-flex align-items-center">
+    <select class="name-input" id="languageSelector" style="margin-right: 0.5rem;">
+      <option value="es">Español</option>
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+    </select>
     <input type="text" class="name-input" id="userNameInput" placeholder="Tu nombre">
     <a href="/login.html" class="btn-solid">Iniciar sesión</a>
     <a href="/register.html" class="btn-solid">Registrarse</a>
@@ -213,24 +228,25 @@
 
   // Handle name input changes and pass to iframe
   const userNameInput = document.getElementById("userNameInput");
+  const languageSelector = document.getElementById("languageSelector");
   const chatFrame = document.getElementById("chatframe");
 
-  userNameInput.addEventListener("input", function() {
-    const name = this.value.trim() || "invitado";
-    chatFrame.contentWindow.postMessage({ 
-      type: "updateName", 
-      name: name 
-    }, "*");
-  });
-
-  // Set initial name when iframe loads
-  chatFrame.addEventListener("load", function() {
+  function updateIframeData() {
     const name = userNameInput.value.trim() || "invitado";
+    const language = languageSelector.value;
+    
     chatFrame.contentWindow.postMessage({ 
-      type: "updateName", 
-      name: name 
+      type: "updateData", 
+      name: name,
+      language: language
     }, "*");
-  });
+  }
+
+  userNameInput.addEventListener("input", updateIframeData);
+  languageSelector.addEventListener("change", updateIframeData);
+
+  // Set initial data when iframe loads
+  chatFrame.addEventListener("load", updateIframeData);
 </script>
 
 <script src="assets/js/bootstrap.bundle.min.js"></script>

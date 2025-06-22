@@ -253,11 +253,13 @@
     const chatDiv = document.getElementById('chat');
     const userMessageInput = document.getElementById('user_message');
     let username = "invitado"; // Default username
+    let language = "es"; // Default language
 
-    // Listen for name updates from parent window
+    // Listen for data updates from parent window
     window.addEventListener("message", (event) => {
-      if (event.data?.type === "updateName") {
+      if (event.data?.type === "updateData") {
         username = event.data.name;
+        language = event.data.language;
       }
     });
 
@@ -406,7 +408,8 @@
         
         const result = await sendMessageWithRetry({ 
           user_id, 
-          message: processedMessage
+          message: processedMessage,
+          language: language
         });
 
         document.getElementById('loading')?.remove();
@@ -502,7 +505,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             user_id: "test", 
-            message: "test"
+            message: "test",
+            language: "es"
           })
         });
         console.log('API Test Response Status:', testResponse.status);

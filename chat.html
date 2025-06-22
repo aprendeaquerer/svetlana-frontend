@@ -227,18 +227,26 @@
     const userMessageInput = document.getElementById('user_message');
     let username = "invitado"; // Default username
     let language = "es"; // Default language
+    let isFirstLoad = true; // Track if this is the first load
 
     // Listen for data updates from parent window
     window.addEventListener("message", (event) => {
       if (event.data?.type === "updateData") {
+        const previousLanguage = language;
         username = event.data.name;
         language = event.data.language;
         updateUILanguage(); // Update UI elements when language changes
+        
+        // If language changed and it's not the first load, send a new greeting
+        if (previousLanguage !== language && !isFirstLoad) {
+          sendInitialGreeting();
+        }
       }
       
       // Handle initial greeting trigger from parent
       if (event.data?.type === "sendInitialGreeting") {
         sendInitialGreeting();
+        isFirstLoad = false; // Mark that initial greeting has been sent
       }
     });
 

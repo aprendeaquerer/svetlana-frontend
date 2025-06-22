@@ -482,7 +482,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       // Test API connection first
       testAPI();
-      sendMessage("saludo inicial");
+      // Send language-specific initial greeting\n        const greetingPhrases = {\n            "es": "saludo inicial",\n            "en": "initial greeting",\n            "ru": "????????? ???????????"\n        };\n        const greetingPhrase = greetingPhrases[language] || "saludo inicial";\n        sendMessage(greetingPhrase);
       
       // Ensure scroll works on page load
       setTimeout(() => {

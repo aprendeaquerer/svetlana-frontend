@@ -43,26 +43,6 @@
       flex: 1;
     }
 
-    .char-counter {
-      position: absolute;
-      bottom: -20px;
-      right: 0;
-      font-size: 0.75rem;
-      color: #666;
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 2px 6px;
-      border-radius: 4px;
-      transition: color 0.2s;
-    }
-
-    .char-counter.warning {
-      color: #ffc107;
-    }
-
-    .char-counter.danger {
-      color: #dc3545;
-    }
-
     .send-button {
       background-color: #bfa2db;
       color: white;
@@ -219,12 +199,6 @@
         flex: 1;
       }
       
-      .char-counter {
-        bottom: -25px;
-        font-size: 0.7rem;
-        background-color: rgba(255, 255, 255, 0.95);
-      }
-      
       .send-button {
         padding: 0.75rem 1.25rem;
         border-radius: 20px;
@@ -244,7 +218,6 @@
   <div class="input-container">
     <div class="input-wrapper">
       <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
-      <div class="char-counter" id="charCounter">0/1000</div>
     </div>
     <button id="send_button" class="send-button">Enviar</button>
   </div>
@@ -301,24 +274,6 @@
     const sendButton = document.getElementById('send_button');
     sendButton.addEventListener("click", function() {
       sendMessage();
-    });
-
-    // Character counter functionality
-    const charCounter = document.getElementById('charCounter');
-    userMessageInput.addEventListener("input", function() {
-      const length = this.value.length;
-      const maxLength = 1000;
-      
-      charCounter.textContent = `${length}/${maxLength}`;
-      charCounter.className = 'char-counter';
-      
-      if (length > maxLength * 0.9) {
-        charCounter.classList.add('warning');
-      }
-      if (length > maxLength * 0.95) {
-        charCounter.classList.remove('warning');
-        charCounter.classList.add('danger');
-      }
     });
 
     // Helper to generate UUID
@@ -433,9 +388,6 @@
       if (!message || message.trim().length === 0) {
         return { valid: false, error: 'El mensaje no puede estar vacío' };
       }
-      if (message.length > 1000) {
-        return { valid: false, error: 'El mensaje es demasiado largo (máximo 1000 caracteres)' };
-      }
       // Check for potentially harmful content
       if (/<script|javascript:|on\w+\s*=|data:text\/html/i.test(message)) {
         return { valid: false, error: 'El mensaje contiene contenido no permitido' };
@@ -482,14 +434,17 @@
     window.addEventListener("DOMContentLoaded", () => {
       // Test API connection first
       testAPI();
-        // Send language-specific initial greeting
-        const greetingPhrases = {
-            "es": "saludo inicial",
-            "en": "initial greeting",
-            "ru": "????????? ???????????"
-        };
-        const greetingPhrase = greetingPhrases[language] || "saludo inicial";
-        sendMessage(greetingPhrase);
+      
+      // Send language-specific initial greeting
+      const greetingPhrases = {
+        "es": "saludo inicial",
+        "en": "initial greeting",
+        "ru": "начальное приветствие"
+      };
+      const greetingPhrase = greetingPhrases[language] || "saludo inicial";
+      sendMessage(greetingPhrase);
+    });
+
     async function testAPI() {
       try {
         // First test if the backend is up

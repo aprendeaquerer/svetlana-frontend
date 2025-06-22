@@ -233,6 +233,7 @@
       if (event.data?.type === "updateData") {
         username = event.data.name;
         language = event.data.language;
+        updateUILanguage(); // Update UI elements when language changes
       }
       
       // Handle initial greeting trigger from parent
@@ -240,6 +241,61 @@
         sendInitialGreeting();
       }
     });
+
+    function updateUILanguage() {
+      const translations = {
+        "es": {
+          placeholder: "Escribe tu mensaje y presiona Enter...",
+          sendButton: "Enviar",
+          sendingButton: "Enviando...",
+          loadingMessage: "Eldric está pensando...",
+          emptyMessageError: "El mensaje no puede estar vacío",
+          harmfulContentError: "El mensaje contiene contenido no permitido",
+          connectionError: "Error de conexión: ",
+          checkInternetError: ". Verifica tu conexión a internet.",
+          tooManyRequestsError: "Demasiadas peticiones. Reintentando en ",
+          connectionRetryError: "Error de conexión. Reintentando en ",
+          seconds: " segundos..."
+        },
+        "en": {
+          placeholder: "Type your message and press Enter...",
+          sendButton: "Send",
+          sendingButton: "Sending...",
+          loadingMessage: "Eldric is thinking...",
+          emptyMessageError: "The message cannot be empty",
+          harmfulContentError: "The message contains forbidden content",
+          connectionError: "Connection error: ",
+          checkInternetError: ". Please check your internet connection.",
+          tooManyRequestsError: "Too many requests. Retrying in ",
+          connectionRetryError: "Connection error. Retrying in ",
+          seconds: " seconds..."
+        },
+        "ru": {
+          placeholder: "Введите сообщение и нажмите Enter...",
+          sendButton: "Отправить",
+          sendingButton: "Отправка...",
+          loadingMessage: "Элдрик думает...",
+          emptyMessageError: "Сообщение не может быть пустым",
+          harmfulContentError: "Сообщение содержит запрещенный контент",
+          connectionError: "Ошибка соединения: ",
+          checkInternetError: ". Проверьте подключение к интернету.",
+          tooManyRequestsError: "Слишком много запросов. Повторная попытка через ",
+          connectionRetryError: "Ошибка соединения. Повторная попытка через ",
+          seconds: " секунд..."
+        }
+      };
+
+      const currentLang = translations[language] || translations["es"];
+      
+      // Update input placeholder
+      userMessageInput.placeholder = currentLang.placeholder;
+      
+      // Update send button text (if not in loading state)
+      const sendButton = document.getElementById('send_button');
+      if (!sendButton.disabled) {
+        sendButton.textContent = currentLang.sendButton;
+      }
+    }
 
     function sendInitialGreeting() {
       // Send language-specific initial greeting
@@ -330,7 +386,13 @@
           // If rate limited, wait before retry
           if (response.status === 429) {
             const waitTime = 1000 * (i + 1);
-            showError(`Demasiadas peticiones. Reintentando en ${waitTime/1000} segundos...`);
+            const translations = {
+              "es": { tooManyRequests: "Demasiadas peticiones. Reintentando en " },
+              "en": { tooManyRequests: "Too many requests. Retrying in " },
+              "ru": { tooManyRequests: "Слишком много запросов. Повторная попытка через " }
+            };
+            const currentLang = translations[language] || translations["es"];
+            showError(`${currentLang.tooManyRequests}${waitTime/1000} segundos...`);
             await new Promise(resolve => setTimeout(resolve, waitTime));
             continue;
           }
@@ -342,7 +404,13 @@
           
           // Wait before retry with exponential backoff
           const waitTime = 1000 * Math.pow(2, i);
-          showError(`Error de conexión. Reintentando en ${waitTime/1000} segundos...`);
+          const translations = {
+            "es": { connectionRetry: "Error de conexión. Reintentando en " },
+            "en": { connectionRetry: "Connection error. Retrying in " },
+            "ru": { connectionRetry: "Ошибка соединения. Повторная попытка через " }
+          };
+          const currentLang = translations[language] || translations["es"];
+          showError(`${currentLang.connectionRetry}${waitTime/1000} segundos...`);
           await new Promise(resolve => setTimeout(resolve, waitTime));
         }
       }
@@ -372,7 +440,13 @@
 
       // Set loading state
       setLoadingState(true);
-      chatDiv.innerHTML += `<div id="loading" class="loading">Eldric está pensando...</div>`;
+      const translations = {
+        "es": { loading: "Eldric está pensando..." },
+        "en": { loading: "Eldric is thinking..." },
+        "ru": { loading: "Элдрик думает..." }
+      };
+      const currentLang = translations[language] || translations["es"];
+      chatDiv.innerHTML += `<div id="loading" class="loading">${currentLang.loading}</div>`;
 
       try {
         console.log('Sending message:', { user_id, message: processedMessage });
@@ -391,7 +465,13 @@
       } catch (error) {
         console.error('Network Error:', error);
         document.getElementById('loading')?.remove();
-        showError(`Error de conexión: ${error.message}. Verifica tu conexión a internet.`);
+        const translations = {
+          "es": { error: "Error de conexión: ", checkInternet: ". Verifica tu conexión a internet." },
+          "en": { error: "Connection error: ", checkInternet: ". Please check your internet connection." },
+          "ru": { error: "Ошибка соединения: ", checkInternet: ". Проверьте подключение к интернету." }
+        };
+        const currentLang = translations[language] || translations["es"];
+        showError(`${currentLang.error}${error.message}${currentLang.checkInternet}`);
       } finally {
         setLoadingState(false);
         resizeIframe();
@@ -401,12 +481,19 @@
 
     // Input validation function
     function validateMessage(message) {
+      const translations = {
+        "es": { empty: "El mensaje no puede estar vacío", harmful: "El mensaje contiene contenido no permitido" },
+        "en": { empty: "The message cannot be empty", harmful: "The message contains forbidden content" },
+        "ru": { empty: "Сообщение не может быть пустым", harmful: "Сообщение содержит запрещенный контент" }
+      };
+      const currentLang = translations[language] || translations["es"];
+      
       if (!message || message.trim().length === 0) {
-        return { valid: false, error: 'El mensaje no puede estar vacío' };
+        return { valid: false, error: currentLang.empty };
       }
       // Check for potentially harmful content
       if (/<script|javascript:|on\w+\s*=|data:text\/html/i.test(message)) {
-        return { valid: false, error: 'El mensaje contiene contenido no permitido' };
+        return { valid: false, error: currentLang.harmful };
       }
       return { valid: true };
     }
@@ -424,13 +511,20 @@
       const sendButton = document.getElementById('send_button');
       const input = document.getElementById('user_message');
       
+      const translations = {
+        "es": { sending: "Enviando...", send: "Enviar", loading: "Eldric está pensando..." },
+        "en": { sending: "Sending...", send: "Send", loading: "Eldric is thinking..." },
+        "ru": { sending: "Отправка...", send: "Отправить", loading: "Элдрик думает..." }
+      };
+      const currentLang = translations[language] || translations["es"];
+      
       if (isLoading) {
         sendButton.disabled = true;
-        sendButton.textContent = 'Enviando...';
+        sendButton.textContent = currentLang.sending;
         input.disabled = true;
       } else {
         sendButton.disabled = false;
-        sendButton.textContent = 'Enviar';
+        sendButton.textContent = currentLang.send;
         input.disabled = false;
       }
     }
@@ -450,6 +544,9 @@
     window.addEventListener("DOMContentLoaded", () => {
       // Test API connection first
       testAPI();
+      
+      // Set initial UI language
+      updateUILanguage();
     });
 
     async function testAPI() {

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aprende a querer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 1rem;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background-color: transparent;
+      color: #2C2C2C;
+      overflow-x: hidden;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+    }
+
+    input[type="text"] {
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 0.75rem;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+      flex: 1;
+    }
+
+    .char-counter {
+      position: absolute;
+      bottom: -20px;
+      right: 0;
+      font-size: 0.75rem;
+      color: #666;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: color 0.2s;
+    }
+
+    .char-counter.warning {
+      color: #ffc107;
+    }
+
+    .char-counter.danger {
+      color: #dc3545;
+    }
+
+    .send-button {
+      background-color: #bfa2db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.2s;
+    }
+
+    .send-button:hover {
+      background-color: #a88bc7;
+    }
+
+    .send-button:active {
+      background-color: #8f6bb3;
+    }
+
+    #chat {
+      padding-bottom: 0.5rem;
+      max-height: 70vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 0.5rem;
+    }
+
+    .message {
+      background-color: #e6e6e6;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      white-space: pre-wrap;
+      line-height: 1.5;
+      font-size: 0.9rem;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      border: 1px solid #d0d0d0;
+    }
+
+    .message p {
+      margin-top: 0.2em;
+      margin-bottom: 0.2em;
+    }
+
+    .message ul {
+      margin-top: 0.3em;
+      margin-bottom: 0.3em;
+    }
+
+    .message li {
+      margin-bottom: 0.1em;
+    }
+
+    .user-msg {
+      background-color: #cccccc;
+      text-align: right;
+      margin-left: auto;
+      margin-right: 0;
+      border: 1px solid #b0b0b0;
+    }
+
+    .Eldric {
+      background-color: #e0d1ef;
+      border: 1px solid #c4a8d8;
+    }
+
+    .loading {
+      color: #666;
+      font-style: italic;
+      margin-bottom: 0.75rem;
+      padding: 0.75rem;
+      background-color: #f8f9fa;
+      border-radius: 12px;
+      border-left: 3px solid #bfa2db;
+      border: 1px solid #e0e0e0;
+      font-size: 0.9rem;
+    }
+
+    .error-msg {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(220, 53, 69, 0.1);
+    }
+
+    .success-msg {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(40, 167, 69, 0.1);
+    }
+
+    .send-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .send-button:disabled:hover {
+      background-color: #ccc;
+    }
+
+    @media (max-width: 768px) {
+      html, body {
+        padding: 0.25rem;
+        margin: 0;
+      }
+      
+      #chat {
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.25rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .message {
+        padding: 0.7rem 0.5rem;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+      }
+      
+      .input-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 0.5rem;
+        border-top: 1px solid #e0e0e0;
+        margin-bottom: 0;
+        z-index: 1000;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      }
+      
+      input[type="text"] {
+        flex: 1;
+        margin-bottom: 0;
+        border-radius: 20px;
+        padding: 0.75rem 1rem;
+      }
+      
+      .input-wrapper {
+        flex: 1;
+      }
+      
+      .char-counter {
+        bottom: -25px;
+        font-size: 0.7rem;
+        background-color: rgba(255, 255, 255, 0.95);
+      }
+      
+      .send-button {
+        padding: 0.75rem 1.25rem;
+        border-radius: 20px;
+        font-weight: 500;
+      }
+      
+      .loading {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="chat"></div>
+  <div class="input-container">
+    <div class="input-wrapper">
+      <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
+      
+    </div>
+    <button id="send_button" class="send-button">Enviar</button>
+  </div>
+
+  <script>
+    const chatDiv = document.getElementById('chat');
+    const userMessageInput = document.getElementById('user_message');
+    let username = "invitado"; // Default username
+    let language = "es"; // Default language
+
+    // Listen for data updates from parent window
+    window.addEventListener("message", (event) => {
+      if (event.data?.type === "updateData") {
+        username = event.data.name;
+        language = event.data.language;
+      }
+    });
+
+    function scrollToBottom() {
+      setTimeout(() => {
+        // Try multiple scroll methods for better mobile compatibility
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+        
+        // Also try smooth scrolling
+        chatDiv.scrollTo({
+          top: chatDiv.scrollHeight,
+          behavior: 'smooth'
+        });
+        
+        // Force a reflow for mobile
+        chatDiv.style.display = 'none';
+        chatDiv.offsetHeight; // Force reflow
+        chatDiv.style.display = 'block';
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }, 100);
+    }
+
+    function resizeIframe() {
+      const height = document.body.scrollHeight;
+      parent.postMessage({ type: "resize", height }, "*");
+      // Add a longer delay for mobile to ensure content is rendered
+      setTimeout(() => {
+        scrollToBottom();
+      }, 200);
+    }
+
+    userMessageInput.addEventListener("keyup", function (event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    // Add send button functionality
+    const sendButton = document.getElementById('send_button');
+    sendButton.addEventListener("click", function() {
+      sendMessage();
+    });
+
+    // Character counter functionality
+    const charCounter = document.getElementById('charCounter');
+    userMessageInput.addEventListener("input", function() {
+      const length = this.value.length;
+      const maxLength = 1000;
+      
+      charCounter.textContent = `${length}/${maxLength}`;
+      charCounter.className = 'char-counter';
+      
+      if (length > maxLength * 0.9) {
+        charCounter.classList.add('warning');
+      }
+      if (length > maxLength * 0.95) {
+        charCounter.classList.remove('warning');
+        charCounter.classList.add('danger');
+      }
+    });
+
+    // Helper to generate UUID
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function getUserId() {
+      // If the username is 'invitado', use a persistent session id
+      if (username === 'invitado') {
+        let sessionId = localStorage.getItem('invitado_session_id');
+        if (!sessionId) {
+          sessionId = generateUUID();
+          localStorage.setItem('invitado_session_id', sessionId);
+        }
+        return sessionId;
+      }
+      return username;
+    }
+
+    // Send message with retry logic
+    async function sendMessageWithRetry(data, maxRetries = 2) {
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          const response = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          
+          if (response.ok) {
+            return await response.json();
+          }
+          
+          // If rate limited, wait before retry
+          if (response.status === 429) {
+            const waitTime = 1000 * (i + 1);
+            showError(`Demasiadas peticiones. Reintentando en ${waitTime/1000} segundos...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            continue;
+          }
+          
+          // For other errors, throw immediately
+          throw new Error(`HTTP ${response.status}`);
+        } catch (error) {
+          if (i === maxRetries - 1) throw error;
+          
+          // Wait before retry with exponential backoff
+          const waitTime = 1000 * Math.pow(2, i);
+          showError(`Error de conexión. Reintentando en ${waitTime/1000} segundos...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+
+    async function sendMessage(messageText = null) {
+      const userMessage = messageText || userMessageInput.value.trim();
+
+      // Input validation
+      const validation = validateMessage(userMessage);
+      if (!validation.valid) {
+        showError(validation.error);
+        return;
+      }
+
+      // Convert single letter choices to uppercase for better recognition
+      const processedMessage = userMessage.length === 1 && /[abc]/i.test(userMessage) 
+        ? userMessage.toUpperCase() 
+        : userMessage;
+
+      const user_id = getUserId();
+
+      if (!messageText) {
+        chatDiv.innerHTML += `<div class="message user-msg"><strong>${sanitizeHTML(username)}:</strong> ${sanitizeHTML(userMessage)}</div>`;
+        scrollToBottom();
+      }
+
+      // Set loading state
+      setLoadingState(true);
+      chatDiv.innerHTML += `<div id="loading" class="loading">Eldric está pensando...</div>`;
+
+      try {
+        console.log('Sending message:', { user_id, message: processedMessage });
+        
+        const result = await sendMessageWithRetry({ 
+          user_id, 
+          message: processedMessage,
+          language: language
+        });
+
+        document.getElementById('loading')?.remove();
+        console.log('API Response (full):', result);
+        chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
+        userMessageInput.value = '';
+        scrollToBottom();
+      } catch (error) {
+        console.error('Network Error:', error);
+        document.getElementById('loading')?.remove();
+        showError(`Error de conexión: ${error.message}. Verifica tu conexión a internet.`);
+      } finally {
+        setLoadingState(false);
+        resizeIframe();
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+    }
+
+    // Input validation function
+    function validateMessage(message) {
+      if (!message || message.trim().length === 0) {
+        return { valid: false, error: 'El mensaje no puede estar vacío' };
+      }
+      if (message.length > 1000) {
+        return { valid: false, error: 'El mensaje es demasiado largo (máximo 1000 caracteres)' };
+      }
+      // Check for potentially harmful content
+      if (/<script|javascript:|on\w+\s*=|data:text\/html/i.test(message)) {
+        return { valid: false, error: 'El mensaje contiene contenido no permitido' };
+      }
+      return { valid: true };
+    }
+
+    // Sanitize HTML to prevent XSS attacks
+    function sanitizeHTML(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Set loading state for better UX
+    function setLoadingState(isLoading) {
+      const sendButton = document.getElementById('send_button');
+      const input = document.getElementById('user_message');
+      
+      if (isLoading) {
+        sendButton.disabled = true;
+        sendButton.textContent = 'Enviando...';
+        input.disabled = true;
+      } else {
+        sendButton.disabled = false;
+        sendButton.textContent = 'Enviar';
+        input.disabled = false;
+      }
+    }
+
+    // Show error messages
+    function showError(message) {
+      chatDiv.innerHTML += `<div class="message error-msg">❌ ${sanitizeHTML(message)}</div>`;
+      scrollToBottom();
+    }
+
+    // Show success messages
+    function showSuccess(message) {
+      chatDiv.innerHTML += `<div class="message success-msg">✅ ${sanitizeHTML(message)}</div>`;
+      scrollToBottom();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      // Test API connection first
+      testAPI();
+      // Send language-specific initial greeting\n        const greetingPhrases = {\n            "es": "saludo inicial",\n            "en": "initial greeting",\n            "ru": "????????? ???????????"\n        };\n        const greetingPhrase = greetingPhrases[language] || "saludo inicial";\n        sendMessage(greetingPhrase);
+      
+      // Ensure scroll works on page load
+      setTimeout(() => {
+        scrollToBottom();
+      }, 500);
+    });
+
+    async function testAPI() {
+      try {
+        // First test if the backend is up
+        const healthCheck = await fetch('https://svetlana-api-ak3a.onrender.com/');
+        console.log('Backend health check status:', healthCheck.status);
+        if (healthCheck.ok) {
+          const healthResult = await healthCheck.json();
+          console.log('Backend health check result:', healthResult);
+        }
+
+        const testResponse = await fetch('https://svetlana-api-ak3a.onrender.com/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            user_id: "test", 
+            message: "test",
+            language: "es"
+          })
+        });
+        console.log('API Test Response Status:', testResponse.status);
+        if (testResponse.ok) {
+          const testResult = await testResponse.json();
+          console.log('API Test Result:', testResult);
+        } else {
+          const errorText = await testResponse.text();
+          console.error('API Test Error:', errorText);
+        }
+      } catch (error) {
+        console.error('API Test Failed:', error);
+      }
+    }
+  </script>
+</body>
+</html>

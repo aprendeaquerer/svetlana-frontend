@@ -391,6 +391,7 @@
         console.log('API Response (full):', result);
         chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
         userMessageInput.value = '';
+        userMessageInput.focus();
         scrollToBottom();
       } catch (error) {
         console.error('Network Error:', error);
@@ -406,6 +407,7 @@
         setLoadingState(false);
         resizeIframe();
         chatDiv.scrollTop = chatDiv.scrollHeight;
+        userMessageInput.focus();
       }
     }
 

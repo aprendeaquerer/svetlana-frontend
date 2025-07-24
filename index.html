@@ -8,11 +8,11 @@
   <link rel="stylesheet" href="assets/css/landing.css">
   <style>
     :root {
-      --color-primary: #BFA2DB;
-      --color-secondary: #EBD8C3;
-      --color-accent: #F6B2A5;
-      --color-bg: #F9F9F9;
-      --color-text: #2C2C2C;
+      --color-primary: #F1DCF4;
+      --color-secondary: #FFF6EA;
+      --color-accent: #F1DCF4;
+      --color-bg: #FFF6EA;
+      --color-text: #042648;
       --color-border: #E0E0E0;
     }
 
@@ -30,8 +30,8 @@
     }
 
     .btn-solid {
-      background-color: #BFA2DB;
-      color: white;
+      background-color: var(--color-primary);
+      color: var(--color-text);
       border: none;
       border-radius: 8px;
       padding: 0.5rem 1.25rem;
@@ -39,23 +39,30 @@
     }
 
     .btn-solid:hover {
-      background-color: #a88bc7;
+      background-color: #e5c8f7;
     }
 
     .navbar {
-      background-color: white;
+      background-color: var(--color-secondary);
       border-bottom: 1px solid var(--color-border);
       padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
     }
 
     .navbar-title {
-      font-weight: 600;
-      font-size: 1.2rem;
-      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--color-text);
+      text-align: center;
+      flex: 1;
     }
 
     .navbar-buttons {
-      margin-left: auto;
+      position: absolute;
+      right: 1rem;
       display: flex;
       align-items: center;
       gap: 1rem;
@@ -195,7 +202,6 @@
       <option value="en">English</option>
       <option value="ru">Русский</option>
     </select>
-    <input type="text" class="name-input" id="userNameInput" placeholder="Tu nombre">
     <a href="/login.html" class="btn-solid">Iniciar sesión</a>
     <a href="/register.html" class="btn-solid">Registrarse</a>
   </div>

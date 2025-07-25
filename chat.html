@@ -223,6 +223,7 @@
     <input id="login_user" placeholder="Usuario o email" style="width:100%; padding:0.75rem; margin-bottom:1rem; border-radius:8px; border:1px solid #ccc;">
     <input id="login_pass" placeholder="Contraseña" type="password" style="width:100%; padding:0.75rem; margin-bottom:1rem; border-radius:8px; border:1px solid #ccc;">
     <button id="login_btn" style="width:100%; padding:0.75rem; background-color:#a88bc7; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Entrar</button>
+    <button id="guest_btn" style="width:100%; padding:0.75rem; background-color:#ccc; color:#333; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:0.5rem;">Entrar como invitado</button>
     <div id="login-error" style="color:#b00; margin-top:0.5rem; text-align:center;"></div>
   </div>
   <div id="chat-section" style="display:none;">
@@ -240,6 +241,8 @@
     let username = "invitado";
     let language = "es";
     let isFirstLoad = true;
+    let guestMessageCount = 0;
+    const GUEST_LIMIT = 15;
     // --- LOGIN LOGIC ---
     const loginSection = document.getElementById('login-section');
     const chatSection = document.getElementById('chat-section');
@@ -282,6 +285,13 @@
         loginError.textContent = "Error de conexión. Intenta de nuevo.";
       }
     };
+    // --- INVITADO ---
+    document.getElementById('guest_btn').onclick = function() {
+      sessionStorage.removeItem('user_id');
+      username = "invitado";
+      guestMessageCount = 0;
+      showChat(username);
+    };
     function showChat(user) {
       loginSection.style.display = 'none';
       chatSection.style.display = '';
@@ -291,6 +301,12 @@
       // Enviar saludo inicial si el chat está vacío
       if (chatDiv.innerHTML.trim() === "") {
         sendInitialGreeting();
+      }
+      // Si es invitado, resetear contador y permitir mensajes
+      if (user === "invitado") {
+        guestMessageCount = 0;
+        userMessageInput.disabled = false;
+        sendButton.disabled = false;
       }
     }
     logoutBtn.onclick = function() {
@@ -435,6 +451,18 @@
         : userMessage;
 
       const user_id = getUserId();
+
+      // Si es invitado, limitar mensajes
+      if (username === "invitado") {
+        if (guestMessageCount >= GUEST_LIMIT) {
+          chatDiv.innerHTML += `<div class="message error-msg">Has alcanzado el límite de 15 mensajes para invitados. Regístrate para continuar.</div>`;
+          userMessageInput.disabled = true;
+          sendButton.disabled = true;
+          scrollToBottom();
+          return;
+        }
+        guestMessageCount++;
+      }
 
       if (!messageText) {
         chatDiv.innerHTML += `<div class="message user-msg"><strong>${sanitizeHTML(username)}:</strong> ${sanitizeHTML(userMessage)}</div>`;

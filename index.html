@@ -196,14 +196,16 @@
 
 <nav class="navbar navbar-expand-lg d-flex align-items-center">
   <div class="navbar-title">Aprende a querer</div>
-  <div class="navbar-buttons d-flex align-items-center">
+  <div class="navbar-buttons d-flex align-items-center" id="navbar-buttons">
     <select class="name-input" id="languageSelector" style="margin-right: 0.5rem;">
       <option value="es">Español</option>
       <option value="en">English</option>
       <option value="ru">Русский</option>
     </select>
-    <a href="/login.html" class="btn-solid">Iniciar sesión</a>
-    <a href="/register.html" class="btn-solid">Registrarse</a>
+    <span id="logged-user-topbar" style="display:none;"></span>
+    <button id="logout-btn-topbar" class="btn-solid" style="display:none;">Logout</button>
+    <a href="/login.html" class="btn-solid" id="login-btn-topbar">Iniciar sesión</a>
+    <a href="/register.html" class="btn-solid" id="register-btn-topbar">Registrarse</a>
   </div>
 </nav>
 
@@ -231,6 +233,33 @@
       iframe.style.height = event.data.height + "px";
     }
   });
+
+  // --- TOPBAR LOGIN LOGIC ---
+  const loginBtnTopbar = document.getElementById('login-btn-topbar');
+  const registerBtnTopbar = document.getElementById('register-btn-topbar');
+  const loggedUserTopbar = document.getElementById('logged-user-topbar');
+  const logoutBtnTopbar = document.getElementById('logout-btn-topbar');
+  function updateTopbar() {
+    const user = sessionStorage.getItem('user_id');
+    if (user) {
+      loggedUserTopbar.textContent = `Logged as: ${user}`;
+      loggedUserTopbar.style.display = '';
+      logoutBtnTopbar.style.display = '';
+      loginBtnTopbar.style.display = 'none';
+      registerBtnTopbar.style.display = 'none';
+    } else {
+      loggedUserTopbar.style.display = 'none';
+      logoutBtnTopbar.style.display = 'none';
+      loginBtnTopbar.style.display = '';
+      registerBtnTopbar.style.display = '';
+    }
+  }
+  updateTopbar();
+  logoutBtnTopbar.onclick = function() {
+    sessionStorage.removeItem('user_id');
+    updateTopbar();
+    location.reload();
+  };
 
   // Handle name input changes and pass to iframe
   const userNameInput = document.getElementById("userNameInput");

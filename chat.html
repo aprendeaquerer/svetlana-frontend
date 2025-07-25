@@ -479,6 +479,11 @@
       
       // Set initial UI language
       updateUILanguage();
+
+      // Si el chat está vacío, envía el saludo inicial
+      if (chatDiv.innerHTML.trim() === "") {
+        sendInitialGreeting();
+      }
     });
 
     async function testAPI() {

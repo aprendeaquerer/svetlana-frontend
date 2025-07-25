@@ -214,21 +214,94 @@
   </style>
 </head>
 <body>
-  <div id="chat"></div>
-  <div class="input-container">
-    <div class="input-wrapper">
-      <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
-    </div>
-    <button id="send_button" class="send-button">Enviar</button>
+  <div id="top-bar" style="display:none; padding: 0.5rem 1rem; background: #e0d1ef; color: #333; font-weight: bold; border-radius: 0 0 12px 12px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+    <span id="logged-user"></span>
+    <button id="logout-btn" style="background: #fff; color: #a88bc7; border: 1px solid #a88bc7; border-radius: 8px; padding: 0.3rem 0.8rem; cursor: pointer; font-weight: bold;">Logout</button>
   </div>
-
+  <div id="login-section" style="max-width: 400px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+    <h2 style="text-align:center; color:#a88bc7;">Iniciar sesión</h2>
+    <input id="login_user" placeholder="Usuario o email" style="width:100%; padding:0.75rem; margin-bottom:1rem; border-radius:8px; border:1px solid #ccc;">
+    <input id="login_pass" placeholder="Contraseña" type="password" style="width:100%; padding:0.75rem; margin-bottom:1rem; border-radius:8px; border:1px solid #ccc;">
+    <button id="login_btn" style="width:100%; padding:0.75rem; background-color:#a88bc7; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Entrar</button>
+    <div id="login-error" style="color:#b00; margin-top:0.5rem; text-align:center;"></div>
+  </div>
+  <div id="chat-section" style="display:none;">
+    <div id="chat"></div>
+    <div class="input-container">
+      <div class="input-wrapper">
+        <input type="text" id="user_message" placeholder="Escribe tu mensaje y presiona Enter...">
+      </div>
+      <button id="send_button" class="send-button">Enviar</button>
+    </div>
+  </div>
   <script>
     const chatDiv = document.getElementById('chat');
     const userMessageInput = document.getElementById('user_message');
-    let username = "invitado"; // Default username
-    let language = "es"; // Default language
-    let isFirstLoad = true; // Track if this is the first load
-
+    let username = "invitado";
+    let language = "es";
+    let isFirstLoad = true;
+    // --- LOGIN LOGIC ---
+    const loginSection = document.getElementById('login-section');
+    const chatSection = document.getElementById('chat-section');
+    const loginBtn = document.getElementById('login_btn');
+    const loginUserInput = document.getElementById('login_user');
+    const loginPassInput = document.getElementById('login_pass');
+    const loginError = document.getElementById('login-error');
+    const topBar = document.getElementById('top-bar');
+    const loggedUser = document.getElementById('logged-user');
+    const logoutBtn = document.getElementById('logout-btn');
+    // Check sessionStorage for user
+    if (sessionStorage.getItem('user_id')) {
+      username = sessionStorage.getItem('user_id');
+      showChat(username);
+    }
+    loginBtn.onclick = async function() {
+      const user_id = loginUserInput.value.trim();
+      const password = loginPassInput.value;
+      if (!user_id || !password) {
+        loginError.textContent = "Por favor, completa usuario/email y contraseña.";
+        return;
+      }
+      loginError.textContent = "";
+      try {
+        const response = await fetch('https://svetlana-api-ak3a.onrender.com/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({user_id, password})
+        });
+        if (response.ok) {
+          const result = await response.json();
+          sessionStorage.setItem('user_id', user_id);
+          username = user_id;
+          showChat(user_id);
+        } else {
+          const error = await response.json();
+          loginError.textContent = error.message || "Nombre de usuario/email o contraseña incorrectos.";
+        }
+      } catch (e) {
+        loginError.textContent = "Error de conexión. Intenta de nuevo.";
+      }
+    };
+    function showChat(user) {
+      loginSection.style.display = 'none';
+      chatSection.style.display = '';
+      topBar.style.display = 'flex';
+      loggedUser.textContent = `Logged as: ${user}`;
+      username = user;
+      // Enviar saludo inicial si el chat está vacío
+      if (chatDiv.innerHTML.trim() === "") {
+        sendInitialGreeting();
+      }
+    }
+    logoutBtn.onclick = function() {
+      sessionStorage.removeItem('user_id');
+      username = "invitado";
+      topBar.style.display = 'none';
+      chatSection.style.display = 'none';
+      loginSection.style.display = '';
+      chatDiv.innerHTML = '';
+      userMessageInput.value = '';
+    };
     // Listen for data updates from parent window
     window.addEventListener("message", (event) => {
       if (event.data?.type === "updateData") {

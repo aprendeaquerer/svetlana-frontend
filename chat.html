@@ -288,6 +288,11 @@
       showChat(username);
     };
     function showChat(user) {
+      // Si no estamos en el iframe, redirigir a index.html
+      if (window.top === window.self) {
+        window.location.href = '/index.html';
+        return;
+      }
       loginSection.style.display = 'none';
       chatSection.style.display = '';
       // Eliminar el bloque de barra superior interna y su lógica asociada

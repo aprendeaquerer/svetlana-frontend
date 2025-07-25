@@ -73,6 +73,10 @@
 
             const result = await response.json();
             alert(result.message);
+            if (result.message && result.message.includes("registrado")) {
+                sessionStorage.setItem('user_id', user_id);
+                window.location.href = '/index.html';
+            }
         }
     </script>
 </body>

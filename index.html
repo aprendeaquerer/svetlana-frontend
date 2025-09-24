@@ -261,14 +261,21 @@
     location.reload();
   };
 
-  // Handle name input changes and pass to iframe
-  const userNameInput = document.getElementById("userNameInput");
+  // Handle language selection and pass data to iframe
   const languageSelector = document.getElementById("languageSelector");
   const chatFrame = document.getElementById("chatframe");
 
+  // Initialize language from localStorage (persist user preference)
+  const savedLanguage = localStorage.getItem('selectedLanguage') || 'es';
+  if (languageSelector) {
+    languageSelector.value = savedLanguage;
+  }
+
   function updateIframeData() {
-    const name = userNameInput.value.trim() || "invitado";
+    const name = sessionStorage.getItem('user_id') || "invitado";
     const language = languageSelector.value;
+    // Persist selected language
+    localStorage.setItem('selectedLanguage', language);
     
     chatFrame.contentWindow.postMessage({ 
       type: "updateData", 
@@ -277,8 +284,16 @@
     }, "*");
   }
 
-  userNameInput.addEventListener("input", updateIframeData);
-  languageSelector.addEventListener("change", updateIframeData);
+  // Listen for language changes and update iframe
+  if (languageSelector) {
+    languageSelector.addEventListener("change", () => {
+      updateIframeData();
+      // After changing language, ask iframe to send a new initial greeting
+      setTimeout(() => {
+        chatFrame.contentWindow.postMessage({ type: "sendInitialGreeting" }, "*");
+      }, 200);
+    });
+  }
 
   // Set initial data when iframe loads
   chatFrame.addEventListener("load", function() {

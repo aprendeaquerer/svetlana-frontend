@@ -495,6 +495,34 @@
         document.getElementById('loading')?.remove();
         console.log('API Response (full):', result);
         chatDiv.innerHTML += `<div class="message Eldric">${result.response}</div>`;
+
+        // Handle paywall - show upgrade button
+        if (result.paywall || result.trigger_checkout) {
+          const upgradeBtn = document.createElement('button');
+          upgradeBtn.textContent = language === 'en' ? '💎 Upgrade to Premium - $9.99/mo' : '💎 Hazte Premium - $9.99/mes';
+          upgradeBtn.style.cssText = 'display:block;margin:12px auto;padding:14px 28px;background:linear-gradient(135deg,#bfa2db,#8b5cf6);color:white;border:none;border-radius:12px;font-size:1.05rem;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(139,92,246,0.3);';
+          upgradeBtn.onclick = async () => {
+            upgradeBtn.disabled = true;
+            upgradeBtn.textContent = language === 'en' ? 'Redirecting...' : 'Redirigiendo...';
+            try {
+              const res = await fetch('https://svetlana-api-ak3a.onrender.com/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: getUserId() })
+              });
+              const data = await res.json();
+              if (data.checkout_url) {
+                window.top.location.href = data.checkout_url;
+              }
+            } catch (err) {
+              console.error('Checkout error:', err);
+              upgradeBtn.disabled = false;
+              upgradeBtn.textContent = language === 'en' ? '💎 Upgrade to Premium - $9.99/mo' : '💎 Hazte Premium - $9.99/mes';
+            }
+          };
+          chatDiv.appendChild(upgradeBtn);
+        }
+
         userMessageInput.value = '';
         userMessageInput.focus();
         scrollToBottom();
@@ -581,9 +609,17 @@
     window.addEventListener("DOMContentLoaded", () => {
       // Test API connection first
       testAPI();
-      
+
       // Set initial UI language
       updateUILanguage();
+
+      // Check if returning from Stripe checkout
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('payment') === 'success') {
+        chatDiv.innerHTML += `<div class="message Eldric"><p>🎉 <strong>${language === 'en' ? 'Welcome to Premium!' : '¡Bienvenido/a a Premium!'}</strong></p><p>${language === 'en' ? 'You now have unlimited access to all features. Enjoy chatting with Eldric!' : '¡Ahora tienes acceso ilimitado a todas las funciones. Disfruta chateando con Eldric!'}</p></div>`;
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname);
+      }
 
       // Si el chat está vacío, envía el saludo inicial
       if (chatDiv.innerHTML.trim() === "") {
